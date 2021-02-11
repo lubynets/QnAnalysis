@@ -16,11 +16,9 @@ int main(int argc, char** argv)
 
   ShapeContainer sc;
   sc.SetShape(histosgnl, histobckgr);
-//   sc.IsA()->SetName("ShapeContainer");
-//   sc.IsA()->SetTitle("sctitle");
 
-  TFile* fileOut = TFile::Open("fileOut.root", "recreate");
-  sc.Write();
+  TFile* fileOut = TFile::Open("shape.root", "recreate");
+  sc.Write("shape");
   fileOut -> Close();
   
   return 0;

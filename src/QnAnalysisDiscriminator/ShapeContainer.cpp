@@ -16,18 +16,18 @@ void ShapeContainer::SetShape(TF1* funcsgnl, TF1* funcbckgr)
   is_histo_ = false;
 }
 
-float ShapeContainer::GetSgnlValue(float x)                       //TODO add warnings ar even errors if histo or/and function is not initialized
+float ShapeContainer::GetSignal(float x)                       //TODO add warnings or even errors if histo or/and function is not initialized
 {
   if(is_histo_ == true)
-    return histo_sgnl_ -> GetBinContent(histo_sgnl_ -> FindBin(x));
+    return histo_sgnl_ -> Interpolate(x);
   else
     return func_sgnl_ -> Eval(x);
 }
 
-float ShapeContainer::GetBckgrValue(float x)                       //TODO add warnings ar even errors if histo or/and function is not initialized
+float ShapeContainer::GetBackground(float x)                       //TODO add warnings or even errors if histo or/and function is not initialized
 {
   if(is_histo_ == true)
-    return histo_bckgr_ -> GetBinContent(histo_bckgr_ -> FindBin(x));
+    return histo_bckgr_ -> Interpolate(x);
   else
     return func_bckgr_ -> Eval(x);
 }

@@ -15,8 +15,8 @@ public:
   void SetShape(TH1F* histosgnl, TH1F* histobckgr);
   void SetShape(TF1* funcsgnl, TF1* funcbckgr);
 
-  float GetSgnlValue(float x);
-  float GetBckgrValue(float x);  
+  float GetSignal(float x);
+  float GetBackground(float x);  
   
 private:
   
@@ -25,7 +25,7 @@ private:
   TF1* func_sgnl_{nullptr};
   TF1* func_bckgr_{nullptr};
   
-  bool is_histo_{false};  
+  bool is_histo_{false};        //TODO generalize for combining TH1 & TF1
   
   ClassDef(ShapeContainer, 1);
 };
