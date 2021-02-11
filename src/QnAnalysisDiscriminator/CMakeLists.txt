@@ -1,5 +1,6 @@
 set(SOURCES Fitter.cpp
-            ShapeContainer.cpp)
+            ShapeContainer.cpp
+            NDimFrame.cpp)
             
 string(REPLACE ".cpp" ".hpp" HEADERS "${SOURCES}")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

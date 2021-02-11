@@ -6,5 +6,6 @@
 
 #pragma link C++ class  Fitter+;
 #pragma link C++ class  ShapeContainer+;
+#pragma link C++ class  NDimFrame+;
 
 #endif
