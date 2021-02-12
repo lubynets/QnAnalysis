@@ -1,7 +1,7 @@
+#include "ShapeContainer.hpp"
+
 #include "TString.h"
 #include "TFile.h"
-
-#include "ShapeContainer.hpp"
 
 int main(int argc, char** argv)
 {

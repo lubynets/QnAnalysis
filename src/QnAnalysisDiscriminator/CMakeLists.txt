@@ -1,5 +1,6 @@
 set(SOURCES Fitter.cpp
             ShapeContainer.cpp
+            ShapeContainerTensor.cpp
             NDimFrame.cpp)
             
 string(REPLACE ".cpp" ".hpp" HEADERS "${SOURCES}")
@@ -16,3 +17,7 @@ target_link_libraries(discriminator QnAnalysisDiscriminator)
 add_executable(shapewriter shapewriter.cxx)
 add_dependencies(shapewriter QnAnalysisDiscriminator)
 target_link_libraries(shapewriter QnAnalysisDiscriminator)
+
+add_executable(shapetensorwriter shapetensorwriter.cxx)
+add_dependencies(shapetensorwriter QnAnalysisDiscriminator)
+target_link_libraries(shapetensorwriter QnAnalysisDiscriminator)

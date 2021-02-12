@@ -1,12 +1,15 @@
 #include "NDimFrame.hpp"
 
+#include <iostream>
+#include <stdexcept>
+
 int NDimFrame::GetGlobalIndex(std::vector<int> i)
 {
   if(n_.size() != i.size())
-    throw std::runtime_error("Number of bins is not equal to dimensionality of n-D cube\n");
+    throw std::runtime_error("Number of sides is not equal to dimensionality of n-D cube");
   for(int j=0; j<n_.size(); j++)
     if(i.at(j) < 0 || i.at(j)>=n_.at(j))
-      throw std::runtime_error("Wrong index number\n");    
+      throw std::runtime_error("Wrong index number");    
     
   return GetGlobalIndexInternal(i, n_);
 }

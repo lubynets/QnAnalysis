@@ -2,13 +2,14 @@
 #define NDimFrame_H
 
 #include <vector>
-#include <stdexcept>
 
 class NDimFrame
 {
 public:
   
-  NDimFrame(std::vector<int> n)         //TODO possibly initialize with Qn::Axes (?)
+  NDimFrame() = default;
+  
+  NDimFrame(std::vector<int> n)
   {
     n_ = n;
   };
@@ -22,9 +23,6 @@ private:
   int GetGlobalIndexInternal(std::vector<int> i, std::vector<int> n);
   
   std::vector<int> n_; //vector of sizes (lengths) of cube edges (side)
-  
-  //TODO possibly add Qn::Axes? OR at least edges?
-  
 };
 
 #endif//NDimFrame_H
