@@ -1,4 +1,5 @@
 #include "Fitter.hpp"
+
 #include "TFile.h"
 
 int main(int argc, char** argv)

@@ -50,6 +50,8 @@ public:
   
   void SetShape(ShapeContainer* shape) { shape_ = shape; };
   void SetGraphToFit(TGraph* graph) { graph_v_ = graph; };
+  double GetVSignal() { return fit_params_.at(0); };
+  double GetVSignalError() { return fit_params_errors_.at(0); };
   
   void Fit();
   
@@ -58,6 +60,9 @@ private:
   
   ShapeContainer* shape_{nullptr};
   TGraph* graph_v_{nullptr};
+  
+  std::vector<double> fit_params_;
+  std::vector<double> fit_params_errors_;
 };
 
 #endif//Fitter_H

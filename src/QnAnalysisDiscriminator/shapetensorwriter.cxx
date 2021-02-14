@@ -5,13 +5,7 @@
 
 #include <string>
 
-std::string StringBinNumber(int number)
-{
-  if(number<10)
-    return "0" + std::to_string(number);
-  else
-    return std::to_string(number);
-}
+std::string StringBinNumber(int number);
 
 int main(int argc, char** argv)
 {
@@ -46,4 +40,12 @@ int main(int argc, char** argv)
   fileOut -> Close();
   
   return 0;
+}
+
+std::string StringBinNumber(int number)
+{
+  if(number<10)
+    return "0" + std::to_string(number);
+  else
+    return std::to_string(number);
 }

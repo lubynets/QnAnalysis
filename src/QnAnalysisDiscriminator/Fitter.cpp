@@ -13,14 +13,9 @@ void Fitter::Fit()
   
   graph_v_ -> Fit("f");
   
-  TFile* fileOut = TFile::Open("fit.root", "recreate");
-  TCanvas* cc = new TCanvas("cc", "CC", 900, 1200);
-  cc -> cd();
-  
-  graph_v_ -> Draw("AP");
-  f -> SetLineColor(kBlue);
-  f -> Draw("same");
-  
-  cc -> Write();
-  fileOut -> Close();
+  for(int i=0; i<4; i++)
+  {
+    fit_params_.push_back(f->GetParameter(i));
+    fit_params_errors_.push_back(f->GetParError(i));
+  }
 }
