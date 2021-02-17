@@ -3,9 +3,9 @@ _layouts:
 _axes:
   - &rec_axis_pT
     name: RecParticlesMcPid/pT
-    nb: 10
+    nb: 7
     lo: 0.3
-    hi: 1.8
+    hi: 1.35
   - &rec_axis_rapidity
     name: RecParticlesMcPid/rapidity
     nb: 7
@@ -13,19 +13,19 @@ _axes:
     hi: 2.52179 # y_beam+0.9
   - &sim_axis_pT
     name: SimParticles/pT
-    nb: 10
+    nb: 7
     lo: 0.3
-    hi: 1.8
+    hi: 1.35
   - &sim_axis_rapidity
     name: SimParticles/rapidity
     nb: 7
     lo: 1.12179 # y_beam-0.5
     hi: 2.52179 # y_beam+0.9
-  #- &axis_mass
-    #name: RecParticlesMcPid/axis_mass
-    #nb: 11
-    #lo: 1.1063830 # 1.115683-5*0.00186
-    #hi: 1.1249830 # 1.115683+5*0.00186
+  - &axis_mass
+    name: RecParticlesMcPid/mass
+    nb: 11
+    lo: 1.1063830 # 1.115683-5*0.00186
+    hi: 1.1249830 # 1.115683+5*0.00186
     
 lambda_analysis:
   event-variables:
@@ -44,10 +44,10 @@ lambda_analysis:
       axes:
         - *rec_axis_pT
         - *rec_axis_rapidity
-        #- *axis_mass
+        - *axis_mass
       cuts:
         RecParticlesMcPid/pid: { equals: 3122 }
-        RecParticlesMcPid/is_signal: { range: [0.9, 1.1] }
+        RecParticlesMcPid/is_signal: { range: [-0.1, 2.1] }
       #qa:
         #- {name: mdc_vtx_tracks/phi, nb: 100, lo: -4., hi: 4.}
         #- *axis_pT

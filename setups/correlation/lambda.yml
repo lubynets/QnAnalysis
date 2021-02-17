@@ -29,10 +29,28 @@ _queries:
     tags: { any-in: [qn_vector] }
     
 _task_args:
-  - &ta_urec
+  - &ta_urec_plain
     query: *query_urec
     query-list: *detectors
-    correction-steps: [plain, recentered, twist, rescaled]
+    correction-steps: [plain]
+    components: *sp_components
+    weight: sumw
+  - &ta_urec_recentered
+    query: *query_urec
+    query-list: *detectors
+    correction-steps: [recentered]
+    components: *sp_components
+    weight: sumw
+  - &ta_urec_twist
+    query: *query_urec
+    query-list: *detectors
+    correction-steps: [twist]
+    components: *sp_components
+    weight: sumw
+  - &ta_urec_rescaled
+    query: *query_urec
+    query-list: *detectors
+    correction-steps: [rescaled]
     components: *sp_components
     weight: sumw
   - &ta_usim
@@ -41,11 +59,6 @@ _task_args:
     correction-steps: [plain]
     components: *sp_components
     weight: sumw
-  #- &ta_q_ep
-    #query: *query_q
-    #query-list: *detectors
-    #correction-steps: [plain]
-    #components: *ep_components
   - &ta_q_sp
     query: *query_q
     query-list: *detectors
@@ -54,32 +67,29 @@ _task_args:
     weight: ones
 
 _tasks:
-  #- args: [ *ta_urec, *ta_q_ep ]
-    ##actions: [xx, xy, yx, yy]
+  #- args: [*ta_urec_plain, *ta_q_sp ]
     #n-samples: 50
     #weights-type: observable
-    ##weights-function: auto
-    #folder: "/uQ/EP"
+    #folder: "/rec/PLAIN"
     #axes: [ *centrality ]
-  - args: [*ta_urec, *ta_q_sp ]
-    #actions: [xx, xy, yx, yy]
+  #- args: [*ta_urec_recentered, *ta_q_sp ]
+    #n-samples: 50
+    #weights-type: observable
+    #folder: "/rec/RECENTERED"
+    #axes: [ *centrality ]
+  #- args: [*ta_urec_twist, *ta_q_sp ]
+    #n-samples: 50
+    #weights-type: observable
+    #folder: "/rec/TWIST"
+    #axes: [ *centrality ]
+  - args: [*ta_urec_rescaled, *ta_q_sp ]
     n-samples: 50
     weights-type: observable
-    #weights-function: auto
-    folder: "/uQ/SP"
+    folder: "/rec/RESCALED"
     axes: [ *centrality ]
-  #- args: [ *ta_usim, *ta_q_ep ]
-    ##actions: [xx, xy, yx, yy]
-    #n-samples: 50
-    #weights-type: observable
-    ##weights-function: auto
-    #folder: "/uQ/EP"
-    #axes: [ *centrality ]
   - args: [*ta_usim, *ta_q_sp ]
-    #actions: [xx, xy, yx, yy]
     n-samples: 50
     weights-type: observable
-    #weights-function: auto
-    folder: "/uQ/SP"
+    folder: "/sim"
     axes: [ *centrality ]
     
