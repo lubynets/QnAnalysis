@@ -26,7 +26,9 @@ public:
   
   double bckgr_fit(double* x, double* par)
   {
-    return par[0] + par[1]*(x[0]-mu) + par[2]*(x[0]-mu)*(x[0]-mu);
+    return par[0] + par[1]*(x[0]-mu);// + par[2]*(x[0]-mu)*(x[0]-mu);
+//     return par[0];
+    
   }
     
   double operator()(double* x, double* par)
@@ -52,6 +54,8 @@ public:
   void SetGraphToFit(TGraph* graph) { graph_v_ = graph; };
   double GetVSignal() { return fit_params_.at(0); };
   double GetVSignalError() { return fit_params_errors_.at(0); };
+  const std::vector<double>& GetFitParameters() { return fit_params_; };
+  const std::vector<double>& GetFitErrors() { return fit_params_errors_; };
   
   void Fit();
   

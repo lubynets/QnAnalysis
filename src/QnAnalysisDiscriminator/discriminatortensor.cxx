@@ -12,7 +12,7 @@ int main(int argc, char** argv)
   TFile* shapefile = TFile::Open(shapefilename, "read");
   ShapeContainerTensor* shcntr = (ShapeContainerTensor*)shapefile -> Get("shapetensor");
   
-  TString v1filename="/home/user/cbmdir/working/qna/bin_extract/cl.dcmqgsm.apr20.defcuts.nopid.all.large.root";
+  TString v1filename="/home/user/cbmdir/working/qna/bin_extract/cl.dcmqgsm.apr20.defcuts.nopid.set2.all.root";
   TFile* v1file = TFile::Open(v1filename, "read");
   
   Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>* lambda_psi_xx = (Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>*)v1file -> Get("rec/RESCALED/u_rec_RESCALED.Q_psi_PLAIN.x1x1");
@@ -23,9 +23,16 @@ int main(int argc, char** argv)
    
   TFile* fileOut = TFile::Open("fileOut.root", "recreate");
   
-  const int C_nbins = 7;
-  const int y_nbins = 7;
-  const int pT_nbins = 7;
+  const int C_nbins = 3;
+  const int y_nbins = 5;
+  const int pT_nbins = 5;
+  
+//   std::vector<TH1F*> histopar;
+//   histopar.resize(4);
+//   for(int j=0; j<2; j++)
+//     histopar.at(j) = new TH1F("histo", std::to_string(j+1).c_str(), 100, -3, 3);
+//   for(int j=2; j<4; j++)
+//     histopar.at(j) = new TH1F("histo", std::to_string(j+1).c_str(), 100, -20, 20);
   
   for(int iC=0; iC<C_nbins; iC++)
     for(int iy=0; iy<y_nbins; iy++)
@@ -43,9 +50,15 @@ int main(int argc, char** argv)
         
         std::string vsignal = std::to_string(fitter.GetVSignal()) + " pm " + std::to_string(fitter.GetVSignalError());
         
+//         for(int j=0; j<4; j++)
+//           histopar.at(j)->Fill(fitter.GetFitParameters().at(j));
+       
         gr -> SetTitle(vsignal.c_str());
         gr -> Write();
       }
+      
+//   for(int j=0; j<4; j++)
+//           histopar.at(j)->Write();
   
   fileOut -> Close();
   
