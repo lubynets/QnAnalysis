@@ -3,6 +3,10 @@
 #include "Fitter.hpp"
 
 #include "TFile.h"
+#include "TDirectory.h"
+#include "TH3.h"
+
+#include <iostream>
 
 std::string StringBinNumber(int number);
 
@@ -20,20 +24,27 @@ int main(int argc, char** argv)
   GraphExtractor gex;
   gex.SetDataContainer(lambda_psi_xx);
   gex.SetNamesAxesToExclude({"AnaEventHeader_tracks_centrality", "RecParticlesMcPid_rapidity", "RecParticlesMcPid_pT"});
-   
-  TFile* fileOut = TFile::Open("fileOut.root", "recreate");
+         
+  std::vector<int> axessizes = gex.GetAxesSizes();
+  std::vector<std::vector<double>> axisbinedges = gex.GetAxesBinEdges();
   
-  const int C_nbins = 3;
-  const int y_nbins = 5;
-  const int pT_nbins = 5;
+  const int C_nbins = axessizes.at(0);
+  const int y_nbins = axessizes.at(1);
+  const int pT_nbins = axessizes.at(2);
   
-//   std::vector<TH1F*> histopar;
-//   histopar.resize(4);
-//   for(int j=0; j<2; j++)
-//     histopar.at(j) = new TH1F("histo", std::to_string(j+1).c_str(), 100, -3, 3);
-//   for(int j=2; j<4; j++)
-//     histopar.at(j) = new TH1F("histo", std::to_string(j+1).c_str(), 100, -20, 20);
+  double* C_edges = &axisbinedges.at(0)[0];
+  double* y_edges = &axisbinedges.at(1)[0];
+  double* pT_edges = &axisbinedges.at(2)[0];
   
+  TH3F hsignal("hsignal", "HSIGNAL", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
+  TH3F hbckgr_0("hbckgr_0", "HBCKGR_0", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
+  TH3F hbckgr_1("hbckgr_1", "HBCKGR_1", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
+  
+  TFile* fileOut = TFile::Open("out.fitter.root", "recreate");
+  TDirectory* dirFit = fileOut->mkdir("fit");
+  TDirectory* dirPar = fileOut->mkdir("parameters");
+  dirFit->cd();
+    
   for(int iC=0; iC<C_nbins; iC++)
     for(int iy=0; iy<y_nbins; iy++)
       for(int ipT=0; ipT<pT_nbins; ipT++)
@@ -49,16 +60,22 @@ int main(int argc, char** argv)
         fitter.Fit();
         
         std::string vsignal = std::to_string(fitter.GetVSignal()) + " pm " + std::to_string(fitter.GetVSignalError());
-        
-//         for(int j=0; j<4; j++)
-//           histopar.at(j)->Fill(fitter.GetFitParameters().at(j));
-       
+               
         gr -> SetTitle(vsignal.c_str());
         gr -> Write();
+        
+        hsignal.SetBinContent(iC+1, iy+1, ipT+1, fitter.GetFitParameters().at(0));
+        hsignal.SetBinError(iC+1, iy+1, ipT+1, fitter.GetFitErrors().at(0));
+        hbckgr_0.SetBinContent(iC+1, iy+1, ipT+1, fitter.GetFitParameters().at(1));
+        hbckgr_0.SetBinError(iC+1, iy+1, ipT+1, fitter.GetFitErrors().at(1));
+        hbckgr_1.SetBinContent(iC+1, iy+1, ipT+1, fitter.GetFitParameters().at(2));
+        hbckgr_1.SetBinError(iC+1, iy+1, ipT+1, fitter.GetFitErrors().at(2));        
       }
       
-//   for(int j=0; j<4; j++)
-//           histopar.at(j)->Write();
+  dirPar->cd();
+  hsignal.Write();
+  hbckgr_0.Write();
+  hbckgr_1.Write();
   
   fileOut -> Close();
   

@@ -19,6 +19,8 @@ public:
   void SetNamesAxesToExclude(std::vector<std::string> names_axes_to_exclude) { names_axes_to_exclude_ = names_axes_to_exclude; };
   
   TGraph* GetGraph(std::vector<int> bin);
+  std::vector<int> GetAxesSizes();
+  std::vector<std::vector<double>> GetAxesBinEdges();
   
 private:
   

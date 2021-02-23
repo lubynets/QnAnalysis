@@ -20,3 +20,26 @@ TGraph* GraphExtractor::GetGraph(std::vector<int> bin)
   
   return graph;
 }
+
+std::vector<int> GraphExtractor::GetAxesSizes()
+{
+  std::vector<int> sizes;
+  for(auto& axisname : names_axes_to_exclude_)
+    sizes.push_back(data_container_->GetAxis(axisname.c_str()).GetNBins());
+  
+  return sizes;
+}
+
+std::vector<std::vector<double>> GraphExtractor::GetAxesBinEdges()
+{
+  std::vector<std::vector<double>> v_binedges;
+  for(auto& axisname : names_axes_to_exclude_)
+  {
+    std::vector<double> binedges;
+    for(int i=0; i<=data_container_->GetAxis(axisname.c_str()).GetNBins(); i++)
+      binedges.push_back(data_container_->GetAxis(axisname.c_str()).GetLowerBinEdge(i));
+    v_binedges.push_back(binedges);
+  }
+  
+  return v_binedges;
+}

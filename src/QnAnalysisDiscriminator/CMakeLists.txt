@@ -26,3 +26,7 @@ target_link_libraries(shapetensorwriter QnAnalysisDiscriminator)
 add_executable(discriminatortensor discriminatortensor.cxx)
 add_dependencies(discriminatortensor QnAnalysisDiscriminator)
 target_link_libraries(discriminatortensor QnAnalysisDiscriminator)
+
+add_executable(mcfitter mcfitter.cxx)
+add_dependencies(mcfitter QnAnalysisDiscriminator)
+target_link_libraries(mcfitter QnAnalysisDiscriminator)
