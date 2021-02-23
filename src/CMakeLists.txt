@@ -7,5 +7,5 @@ add_subdirectory(QnAnalysisObservablesEK)
 #add_subdirectory(correlate)
 #add_subdirectory(tasks)
 #add_subdirectory(analyze)
-#add_subdirectory(tools)
+add_subdirectory(tools)
 

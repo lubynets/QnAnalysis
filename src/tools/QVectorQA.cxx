@@ -12,6 +12,7 @@
 #include <TTreeReaderValue.h>
 #include <TTreeReader.h>
 #include <TDirectory.h>
+#include <TH1D.h>
 #include <TH2D.h>
 
 using namespace std;
@@ -108,7 +109,8 @@ int main(int argc, char **argv) {
 
     iEvent = 0;
     treeReader.Restart();
-    while (treeReader.Next()) {
+    while (treeReader.Next() && iEvent<1000) {
+//     for(iEvent=0; iEvent<1000; iEvent++) {    
 
       std::cout << "Event # " << iEvent+1 << "\r" << std::flush;
 
@@ -129,6 +131,20 @@ int main(int argc, char **argv) {
           auto *h2QyVsQx_weighted =
               createOrGet(binDir, Form("QyVsQxWeighted_H%u", iHarmonic), TH2D("test", "", 400, -2, 2, 400, -2, 2));
           h2QyVsQx_weighted->Fill(qX, qY, weight);
+          
+          auto *h1Qx =
+              createOrGet(binDir, Form("Qx_H%u", iHarmonic), TH1D("test", "", 4000, -2, 2));
+          h1Qx->Fill(qX);
+          auto *h1Qx_weighted =
+              createOrGet(binDir, Form("QxWeighted_H%u", iHarmonic), TH1D("test", "", 4000, -2, 2));
+          h1Qx_weighted->Fill(qX, weight);
+          
+          auto *h1Qyx =
+              createOrGet(binDir, Form("Qy_H%u", iHarmonic), TH1D("test", "", 4000, -2, 2));
+          h1Qyx->Fill(qY);
+          auto *h1Qy_weighted =
+              createOrGet(binDir, Form("QyWeighted_H%u", iHarmonic), TH1D("test", "", 4000, -2, 2));
+          h1Qy_weighted->Fill(qY, weight);
         }
 
         ++iContainerBin;
