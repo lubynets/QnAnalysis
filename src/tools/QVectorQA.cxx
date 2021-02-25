@@ -107,13 +107,15 @@ int main(int argc, char **argv) {
     cout << qVecQAEntry.name << endl;
     auto *qVecQAEntryTopDir = mkdirOrGet(qaFile.get(), qVecQAEntry.name);
 
-    iEvent = 0;
-    treeReader.Restart();
-    while (treeReader.Next() && iEvent<1000) {
+    iEvent = 110000;
+//     treeReader.Restart();
+    treeReader.SetEntry(iEvent);
+    while (treeReader.Next() && iEvent<114999) {
 //     for(iEvent=0; iEvent<1000; iEvent++) {    
 
-      std::cout << "Event # " << iEvent+1 << "\r" << std::flush;
-
+//       std::cout << "Event # " << iEvent+1 << "\r" << std::flush;
+      std::cout << "Event # " << treeReader.GetCurrentEntry() << "\r" << std::flush;
+      
       const auto &qVecContainer = qVecQAEntry.getVal();
 
       unsigned int iContainerBin = 0;
