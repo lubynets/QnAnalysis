@@ -12,7 +12,7 @@ _detectors: &detectors
 _axes:
   - &centrality
     name: AnaEventHeader_tracks_centrality
-    bin-edges: [0, 5, 10, 20, 30, 50, 70, 100]
+    bin-edges: [0, 20, 40, 100]
     
 _components:
   - &sp_components
@@ -67,21 +67,21 @@ _task_args:
     weight: ones
 
 _tasks:
-  #- args: [*ta_urec_plain, *ta_q_sp ]
-    #n-samples: 50
-    #weights-type: observable
-    #folder: "/rec/PLAIN"
-    #axes: [ *centrality ]
-  #- args: [*ta_urec_recentered, *ta_q_sp ]
-    #n-samples: 50
-    #weights-type: observable
-    #folder: "/rec/RECENTERED"
-    #axes: [ *centrality ]
-  #- args: [*ta_urec_twist, *ta_q_sp ]
-    #n-samples: 50
-    #weights-type: observable
-    #folder: "/rec/TWIST"
-    #axes: [ *centrality ]
+  - args: [*ta_urec_plain, *ta_q_sp ]
+    n-samples: 50
+    weights-type: observable
+    folder: "/rec/PLAIN"
+    axes: [ *centrality ]
+  - args: [*ta_urec_recentered, *ta_q_sp ]
+    n-samples: 50
+    weights-type: observable
+    folder: "/rec/RECENTERED"
+    axes: [ *centrality ]
+  - args: [*ta_urec_twist, *ta_q_sp ]
+    n-samples: 50
+    weights-type: observable
+    folder: "/rec/TWIST"
+    axes: [ *centrality ]
   - args: [*ta_urec_rescaled, *ta_q_sp ]
     n-samples: 50
     weights-type: observable
