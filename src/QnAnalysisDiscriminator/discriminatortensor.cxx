@@ -12,11 +12,11 @@ std::string StringBinNumber(int number);
 
 int main(int argc, char** argv)
 {
-  TString shapefilename="/home/user/cbmdir/working/massfit/shapetensor.root";
+  TString shapefilename="/home/user/cbmdir/working/massfit/shapetensor.apr20.dcmqgsm.nopid.defcuts.set3.root";
   TFile* shapefile = TFile::Open(shapefilename, "read");
   ShapeContainerTensor* shcntr = (ShapeContainerTensor*)shapefile -> Get("shapetensor");
   
-  TString v1filename="/home/user/cbmdir/working/qna/bin_extract/cl.dcmqgsm.apr20.defcuts.nopid.set2.all.root";
+  TString v1filename="/home/user/cbmdir/working/qna/bin_extract/cl.dcmqgsm.apr20.defcuts.nopid.set3.all.root";
   TFile* v1file = TFile::Open(v1filename, "read");
   
   Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>* lambda_psi_xx = (Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>*)v1file -> Get("rec/RESCALED/u_rec_RESCALED.Q_psi_PLAIN.x1x1");
@@ -36,9 +36,28 @@ int main(int argc, char** argv)
   double* y_edges = &axisbinedges.at(1)[0];
   double* pT_edges = &axisbinedges.at(2)[0];
   
-  TH3F hsignal("hsignal", "HSIGNAL", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
-  TH3F hbckgr_0("hbckgr_0", "HBCKGR_0", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
-  TH3F hbckgr_1("hbckgr_1", "HBCKGR_1", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
+  TH3F hsignal("hsignal", "", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
+  TH3F hbckgr_0("hbckgr_0", "", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
+  TH3F hbckgr_1("hbckgr_1", "", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
+  
+  TH3F hentries_sgnl("hentries_sgnl", "", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
+  TH3F hentries_bckgr("hentries_bckgr", "", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
+  
+  hsignal.GetXaxis()->SetTitle("centrality, %");
+  hsignal.GetYaxis()->SetTitle("rapidity");
+  hsignal.GetZaxis()->SetTitle("p_{T}, GeV");
+  hbckgr_0.GetXaxis()->SetTitle("centrality, %");
+  hbckgr_0.GetYaxis()->SetTitle("rapidity");
+  hbckgr_0.GetZaxis()->SetTitle("p_{T}, GeV");
+  hbckgr_1.GetXaxis()->SetTitle("centrality, %");
+  hbckgr_1.GetYaxis()->SetTitle("rapidity");
+  hbckgr_1.GetZaxis()->SetTitle("p_{T}, GeV");
+  hentries_sgnl.GetXaxis()->SetTitle("centrality, %");
+  hentries_sgnl.GetYaxis()->SetTitle("rapidity");
+  hentries_sgnl.GetZaxis()->SetTitle("p_{T}, GeV");
+  hentries_bckgr.GetXaxis()->SetTitle("centrality, %");
+  hentries_bckgr.GetYaxis()->SetTitle("rapidity");
+  hentries_bckgr.GetZaxis()->SetTitle("p_{T}, GeV");
   
   TFile* fileOut = TFile::Open("out.fitter.root", "recreate");
   TDirectory* dirFit = fileOut->mkdir("fit");
@@ -69,13 +88,19 @@ int main(int argc, char** argv)
         hbckgr_0.SetBinContent(iC+1, iy+1, ipT+1, fitter.GetFitParameters().at(1));
         hbckgr_0.SetBinError(iC+1, iy+1, ipT+1, fitter.GetFitErrors().at(1));
         hbckgr_1.SetBinContent(iC+1, iy+1, ipT+1, fitter.GetFitParameters().at(2));
-        hbckgr_1.SetBinError(iC+1, iy+1, ipT+1, fitter.GetFitErrors().at(2));        
+        hbckgr_1.SetBinError(iC+1, iy+1, ipT+1, fitter.GetFitErrors().at(2));
+        
+        hentries_sgnl.SetBinContent(iC+1, iy+1, ipT+1, shcntr->GetShape({iC, iy, ipT})->GetSignalIntegral(1.110, 1.1214));        //TODO remove hardcode
+        hentries_bckgr.SetBinContent(iC+1, iy+1, ipT+1, shcntr->GetShape({iC, iy, ipT})->GetBackgroundIntegral(1.110, 1.1214)); 
       }
       
   dirPar->cd();
   hsignal.Write();
   hbckgr_0.Write();
   hbckgr_1.Write();
+  
+  hentries_sgnl.Write();
+  hentries_bckgr.Write();
   
   fileOut -> Close();
   

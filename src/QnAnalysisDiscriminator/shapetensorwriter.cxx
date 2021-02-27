@@ -9,8 +9,8 @@ std::string StringBinNumber(int number);
 
 int main(int argc, char** argv)
 {
-  TString sgnlfilename="/home/user/cbmdir/working/massfit/out.mass3D.apr20.dcmqgsm.nopid.defcuts.set2.sgnl_12.root";
-  TString bckgrfilename="/home/user/cbmdir/working/massfit/out.mass3D.apr20.dcmqgsm.nopid.defcuts.set2.bckgr.root";
+  TString sgnlfilename="/home/user/cbmdir/working/massfit/out.mass3D.apr20.dcmqgsm.nopid.defcuts.set3.sgnl_12.root";
+  TString bckgrfilename="/home/user/cbmdir/working/massfit/out.mass3D.apr20.dcmqgsm.nopid.defcuts.set3.bckgr.root";
   
   TFile* sgnlfile = TFile::Open(sgnlfilename, "read");
   TFile* bckgrfile = TFile::Open(bckgrfilename, "read");

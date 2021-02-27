@@ -30,3 +30,7 @@ target_link_libraries(discriminatortensor QnAnalysisDiscriminator)
 add_executable(mcfitter mcfitter.cxx)
 add_dependencies(mcfitter QnAnalysisDiscriminator)
 target_link_libraries(mcfitter QnAnalysisDiscriminator)
+
+add_executable(mcextractor mcextractor.cxx)
+add_dependencies(mcextractor QnAnalysisDiscriminator)
+target_link_libraries(mcextractor QnAnalysisDiscriminator)

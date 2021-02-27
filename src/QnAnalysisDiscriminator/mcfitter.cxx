@@ -9,10 +9,10 @@ std::string StringBinNumber(int number);
 
 int main(int argc, char** argv)
 {
-  TString sgnlfilename="/home/user/cbmdir/working/qna/bin_extract/cl.dcmqgsm.apr20.defcuts.nopid.set2.sgnl_12.root";
+  TString sgnlfilename="/home/user/cbmdir/working/qna/bin_extract/cl.dcmqgsm.apr20.defcuts.nopid.set3.sgnl_12.root";
   TFile* sgnlfile = TFile::Open(sgnlfilename, "read");
     
-  TString bckgrfilename="/home/user/cbmdir/working/qna/bin_extract/cl.dcmqgsm.apr20.defcuts.nopid.set2.bckgr.root";
+  TString bckgrfilename="/home/user/cbmdir/working/qna/bin_extract/cl.dcmqgsm.apr20.defcuts.nopid.set3.bckgr.root";
   TFile* bckgrfile = TFile::Open(bckgrfilename, "read");
   
   GraphExtractor sgnlgex;
@@ -39,6 +39,16 @@ int main(int argc, char** argv)
   TH3F hsignal("hsignal", "HSIGNAL", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
   TH3F hbckgr_0("hbckgr_0", "HBCKGR_0", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
   TH3F hbckgr_1("hbckgr_1", "HBCKGR_1", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
+  
+  hsignal.GetXaxis()->SetTitle("centrality, %");
+  hsignal.GetYaxis()->SetTitle("rapidity");
+  hsignal.GetZaxis()->SetTitle("p_{T}, GeV");
+  hbckgr_0.GetXaxis()->SetTitle("centrality, %");
+  hbckgr_0.GetYaxis()->SetTitle("rapidity");
+  hbckgr_0.GetZaxis()->SetTitle("p_{T}, GeV");
+  hbckgr_1.GetXaxis()->SetTitle("centrality, %");
+  hbckgr_1.GetYaxis()->SetTitle("rapidity");
+  hbckgr_1.GetZaxis()->SetTitle("p_{T}, GeV");
   
   TFile* fileOut = TFile::Open("out.mcfitter.root", "recreate");
   TDirectory* dirSignal = fileOut->mkdir("signalfits");
