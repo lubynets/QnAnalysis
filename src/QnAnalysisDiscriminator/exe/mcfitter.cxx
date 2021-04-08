@@ -9,10 +9,10 @@ std::string StringBinNumber(int number);
 
 int main(int argc, char** argv)
 {
-  TString sgnlfilename="/home/user/cbmdir/working/qna/bin_extract/cl.dcmqgsm.apr20.defcuts.nopid.set3.sgnl_12.root";
+  TString sgnlfilename="/home/user/cbmdir/working/qna/aXmass/cl.dcmqgsm.apr20.lightcuts1.nopid.set4pull.sgnl_12.root";
+  TString bckgrfilename="/home/user/cbmdir/working/qna/aXmass/cl.dcmqgsm.apr20.lightcuts1.nopid.set4pull.bckgr.root";
+
   TFile* sgnlfile = TFile::Open(sgnlfilename, "read");
-    
-  TString bckgrfilename="/home/user/cbmdir/working/qna/bin_extract/cl.dcmqgsm.apr20.defcuts.nopid.set3.bckgr.root";
   TFile* bckgrfile = TFile::Open(bckgrfilename, "read");
   
   GraphExtractor sgnlgex;

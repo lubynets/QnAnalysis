@@ -9,7 +9,7 @@ std::string StringBinNumber(int number);
 
 int main(int argc, char** argv)
 {
-  TString filename="/home/user/cbmdir/working/qna/bin_extract/cl.dcmqgsm.apr20.defcuts.nopid.set3.all.root";
+  TString filename="/home/user/cbmdir/working/qna/aXmass/cl.dcmqgsm.apr20.lightcuts1.nopid.set4pull.all.root";
   TFile* fileIn = TFile::Open(filename, "read");
   
   GraphExtractor gex;

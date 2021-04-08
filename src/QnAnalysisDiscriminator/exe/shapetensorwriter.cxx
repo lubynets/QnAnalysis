@@ -9,8 +9,8 @@ std::string StringBinNumber(int number);
 
 int main(int argc, char** argv)
 {
-  TString sgnlfilename="/home/user/cbmdir/working/massfit/out.mass3D.apr20.dcmqgsm.nopid.defcuts.set3.sgnl_12.root";
-  TString bckgrfilename="/home/user/cbmdir/working/massfit/out.mass3D.apr20.dcmqgsm.nopid.defcuts.set3.bckgr.root";
+  TString sgnlfilename="/home/user/cbmdir/working/qna/shapes/out.mass3D.apr20.dcmqgsm.nopid.lightcuts1.set4.sgnl_12.root";
+  TString bckgrfilename="/home/user/cbmdir/working/qna/shapes/out.mass3D.apr20.dcmqgsm.nopid.lightcuts1.set4.bckgr.root";
   
   TFile* sgnlfile = TFile::Open(sgnlfilename, "read");
   TFile* bckgrfile = TFile::Open(bckgrfilename, "read");
@@ -19,8 +19,8 @@ int main(int argc, char** argv)
   TH1F* histobckgr = nullptr;
   
   const int C_nbins = 3;
-  const int y_nbins = 5;
-  const int pT_nbins = 5;
+  const int y_nbins = 4;
+  const int pT_nbins = 4;
   
   ShapeContainerTensor sct;
   sct.SetFrame({C_nbins, y_nbins, pT_nbins});

@@ -12,11 +12,11 @@ std::string StringBinNumber(int number);
 
 int main(int argc, char** argv)
 {
-  TString shapefilename="/home/user/cbmdir/working/massfit/shapetensor.apr20.dcmqgsm.nopid.defcuts.set3.root";
+  TString shapefilename="/home/user/cbmdir/working/qna/shapes/shapetensor.apr20.dcmqgsm.nopid.lightcuts1.set4.root";
   TFile* shapefile = TFile::Open(shapefilename, "read");
   ShapeContainerTensor* shcntr = (ShapeContainerTensor*)shapefile -> Get("shapetensor");
   
-  TString v1filename="/home/user/cbmdir/working/qna/bin_extract/cl.dcmqgsm.apr20.defcuts.nopid.set3.all.root";
+  TString v1filename="/home/user/cbmdir/working/qna/aXmass/cl.dcmqgsm.apr20.lightcuts1.nopid.set4.all.root";
   TFile* v1file = TFile::Open(v1filename, "read");
   
   Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>* lambda_psi_xx = (Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>*)v1file -> Get("rec/RESCALED/u_rec_RESCALED.Q_psi_PLAIN.x1x1");
