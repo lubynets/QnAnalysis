@@ -42,7 +42,7 @@ int main(int argc, char** argv)
   
   TH3F hentries_sgnl("hentries_sgnl", "", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
   TH3F hentries_bckgr("hentries_bckgr", "", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
-  
+    
   hsignal.GetXaxis()->SetTitle("centrality, %");
   hsignal.GetYaxis()->SetTitle("rapidity");
   hsignal.GetZaxis()->SetTitle("p_{T}, GeV");
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
         gr -> GetXaxis() -> SetTitle("m_{inv}, GeV");
         
         Fitter fitter;
-        fitter.SetShape(shcntr->GetShape({iC, iy, ipT}));
+        fitter.SetShape(shcntr->GetShapeContainer({iC, iy, ipT}));
         fitter.SetGraphToFit(gr);
         fitter.Fit();
         
@@ -90,8 +90,8 @@ int main(int argc, char** argv)
         hbckgr_1.SetBinContent(iC+1, iy+1, ipT+1, fitter.GetFitParameters().at(2));
         hbckgr_1.SetBinError(iC+1, iy+1, ipT+1, fitter.GetFitErrors().at(2));
         
-        hentries_sgnl.SetBinContent(iC+1, iy+1, ipT+1, shcntr->GetShape({iC, iy, ipT})->GetSignalIntegral(1.110, 1.1214));        //TODO remove hardcode
-        hentries_bckgr.SetBinContent(iC+1, iy+1, ipT+1, shcntr->GetShape({iC, iy, ipT})->GetBackgroundIntegral(1.110, 1.1214)); 
+        hentries_sgnl.SetBinContent(iC+1, iy+1, ipT+1, shcntr->GetShapeContainer({iC, iy, ipT})->GetSignalIntegral(1.110, 1.1214));        //TODO remove hardcode
+        hentries_bckgr.SetBinContent(iC+1, iy+1, ipT+1, shcntr->GetShapeContainer({iC, iy, ipT})->GetBackgroundIntegral(1.110, 1.1214)); 
       }
       
   dirPar->cd();

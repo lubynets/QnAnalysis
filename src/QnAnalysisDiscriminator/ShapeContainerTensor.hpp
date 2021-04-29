@@ -20,9 +20,11 @@ public:
   void SetShape(TF1* funcsgnl, TF1* funcbckgr, std::vector<int> i);
   void SetShape(TH1F* histosgnl, TF1* funcbckgr, std::vector<int> i);
   void SetShape(TF1* funcsgnl, TH1F* histobckgr, std::vector<int> i);
-  ShapeContainer* GetShape(std::vector<int> i) { return shape_container_tensor_ -> at(frame_ -> GetGlobalIndex(i)); };
-  float GetSignal(float x, std::vector<int> i) { return shape_container_tensor_ -> at(frame_ -> GetGlobalIndex(i)) -> GetSignal(x); };
-  float GetBackground(float x, std::vector<int> i) { return shape_container_tensor_ -> at(frame_ -> GetGlobalIndex(i)) -> GetBackground(x); };
+  void SetChi2BckgrFit(float value, std::vector<int> i) { this -> GetShapeContainer(i) -> SetChi2BckgrFit(value); };
+  ShapeContainer* GetShapeContainer(std::vector<int> i) { return shape_container_tensor_ -> at(frame_ -> GetGlobalIndex(i)); };
+  float GetSignal(float x, std::vector<int> i) { return this -> GetShapeContainer(i) -> GetSignal(x); };
+  float GetBackground(float x, std::vector<int> i) { return this -> GetShapeContainer(i) -> GetBackground(x); };
+  float GetChi2BckgrFit(std::vector<int> i) { return this -> GetShapeContainer(i) -> GetChi2BckgrFit(); };
   
 private:
   

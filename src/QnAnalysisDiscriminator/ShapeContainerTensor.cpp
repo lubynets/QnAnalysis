@@ -22,20 +22,20 @@ void ShapeContainerTensor::SetFrame(std::vector<int> lengths)
 
 void ShapeContainerTensor::SetShape(TH1F* histosgnl, TH1F* histobckgr, std::vector<int> i)
 {
-  shape_container_tensor_ -> at(frame_ -> GetGlobalIndex(i)) -> SetShape(histosgnl, histobckgr);
+  this -> GetShapeContainer(i) -> SetShape(histosgnl, histobckgr);
 }
 
 void ShapeContainerTensor::SetShape(TF1* funcsgnl, TF1* funcbckgr, std::vector<int> i)
 {
-  shape_container_tensor_ -> at(frame_ -> GetGlobalIndex(i)) -> SetShape(funcsgnl, funcbckgr);
+  this -> GetShapeContainer(i) -> SetShape(funcsgnl, funcbckgr);
 }
 
 void ShapeContainerTensor::SetShape(TH1F* histosgnl, TF1* funcbckgr, std::vector<int> i)
 {
-  shape_container_tensor_ -> at(frame_ -> GetGlobalIndex(i)) -> SetShape(histosgnl, funcbckgr);
+  this -> GetShapeContainer(i) -> SetShape(histosgnl, funcbckgr);
 }
 
 void ShapeContainerTensor::SetShape(TF1* funcsgnl, TH1F* histobckgr, std::vector<int> i)
 {
-  shape_container_tensor_ -> at(frame_ -> GetGlobalIndex(i)) -> SetShape(funcsgnl, histobckgr);
+  this -> GetShapeContainer(i) -> SetShape(funcsgnl, histobckgr);
 }
