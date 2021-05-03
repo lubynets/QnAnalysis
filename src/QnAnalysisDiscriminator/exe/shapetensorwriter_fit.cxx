@@ -9,6 +9,7 @@
 #include <string>
 
 std::string StringBinNumber(int number);
+float GetChi2TH1FTF1(TH1F* histo, TF1* func);
 
 int main(int argc, char** argv)
 {
@@ -41,12 +42,23 @@ int main(int argc, char** argv)
   hchi2_bckgr_fit.GetYaxis()->SetTitle("rapidity");
   hchi2_bckgr_fit.GetZaxis()->SetTitle("p_{T}, GeV");
   
+  TH3F hchi2_bckgr_func_histo("hchi2_bckgr_func_histo", "", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
+  hchi2_bckgr_func_histo.GetXaxis()->SetTitle("centrality, %");
+  hchi2_bckgr_func_histo.GetYaxis()->SetTitle("rapidity");
+  hchi2_bckgr_func_histo.GetZaxis()->SetTitle("p_{T}, GeV");
+  
+  TH3F hchi2_sgnl_fit("hchi2_sgnl_fit", "", C_nbins, C_edges, y_nbins, y_edges, pT_nbins, pT_edges);
+  hchi2_sgnl_fit.GetXaxis()->SetTitle("centrality, %");
+  hchi2_sgnl_fit.GetYaxis()->SetTitle("rapidity");
+  hchi2_sgnl_fit.GetZaxis()->SetTitle("p_{T}, GeV");
+  
   ShapeContainerTensor sct;
   sct.SetFrame({C_nbins, y_nbins, pT_nbins});
   
   TFile* fileOut = TFile::Open("shapetensor_fit.root", "recreate");
-  fileOut -> mkdir("bckgr");
-  fileOut -> mkdir("sgnl");
+  fileOut -> mkdir("bckgr_mc_and_fitrec");
+  fileOut -> mkdir("sgnl_mc_and_rec");
+  fileOut -> mkdir("sgnl_rec_and_fitrec");
   
   for(int iC=0; iC<C_nbins; iC++)
     for(int iy=0; iy<y_nbins; iy++)
@@ -60,34 +72,72 @@ int main(int argc, char** argv)
         sftr.Fit();
         sct.SetShape(sftr.GetHistoSgnl(), sftr.GetFuncBckgr(), {iC, iy, ipT});
         sct.SetChi2BckgrFit(sftr.GetChi2BckgrFit(), {iC, iy, ipT});
-        
-        fileOut -> cd("bckgr");
+                
+        fileOut -> cd("bckgr_mc_and_fitrec");
         TCanvas c_bckgr("", "", 1500, 900);
         c_bckgr.cd();
         histobckgr -> Draw();
         sftr.GetFuncBckgr() -> Draw("same");
         c_bckgr.Write(binname.c_str());
         
-        fileOut -> cd("sgnl");
-        TCanvas c_sgnl("", "", 1500, 900);
-        c_sgnl.cd();
+        fileOut -> cd("sgnl_mc_and_rec");
+        TCanvas c_sgnl_res("", "", 1500, 900);
+        c_sgnl_res.cd();
         histosgnl -> Draw();
         sftr.GetHistoSgnl() -> SetLineColor(kRed);
         sftr.GetHistoSgnl() -> Draw("same");
-        c_sgnl.Write(binname.c_str());
+        c_sgnl_res.Write(binname.c_str());
+        
+        fileOut -> cd("sgnl_rec_and_fitrec");
+        TCanvas c_sgnl_fit("", "", 1500, 900);
+        c_sgnl_fit.cd();
+        sftr.GetHistoSgnl() -> SetLineColor(kBlue);
+        sftr.GetHistoSgnl() -> Draw();
+        sftr.GetFuncSgnl() -> Draw("same");
+        c_sgnl_fit.Write(binname.c_str());        
         
         hchi2_bckgr_fit.SetBinContent(iC+1, iy+1, ipT+1, sftr.GetChi2BckgrFit());
+        hchi2_bckgr_func_histo.SetBinContent(iC+1, iy+1, ipT+1, GetChi2TH1FTF1(histobckgr, sftr.GetFuncBckgr()));
+        hchi2_sgnl_fit.SetBinContent(iC+1, iy+1, ipT+1, sftr.GetChi2SgnlFit());
       }
   
   fileOut -> cd();
   sct.Write("shapetensor");
   hchi2_bckgr_fit.Write();
+  hchi2_bckgr_func_histo.Write();
+  hchi2_sgnl_fit.Write();
   fileOut -> Close();
   
   
   allfile -> Close();
   
   return 0;
+}
+
+float GetChi2TH1FTF1(TH1F* histo, TF1* func)
+{
+  int firstbin = histo -> FindBin(func->GetXmin());
+  if(histo->GetBinCenter(firstbin) < func->GetXmin())
+    firstbin++;
+  
+  int lastbin = histo -> FindBin(func->GetXmax());
+  if(histo->GetBinCenter(lastbin) > func->GetXmax())
+    lastbin--;
+  
+  int ndf = 0;
+  float chi2 = 0.f;
+  for(int iBin=firstbin; iBin<=lastbin; iBin++)
+  {
+    const float delta = (func->Eval(histo->GetBinCenter(iBin)) - histo->GetBinContent(iBin)) / histo->GetBinError(iBin);
+    chi2 += delta*delta;
+    ndf++;
+  }
+  
+  ndf -= func->GetNpar();
+  
+  std::cout << "chi2/ndf = " << chi2 << " / " << ndf << "\n";
+  
+  return chi2/ndf;
 }
 
 std::string StringBinNumber(int number)
