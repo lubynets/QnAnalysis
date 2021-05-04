@@ -18,7 +18,7 @@ public:
   float GetChi2BckgrFit() const { return chi2_bckgr_fit_ ; };
   float GetChi2SgnlFit() const { return chi2_sgnl_fit_; };
   
-private:
+// private:
   
   TH1F* ExcludeInterval(TH1F* histo, float left, float right) const;
   TF1* FitBckgr(TH1F* histo, float left, float right) const;
@@ -32,7 +32,7 @@ private:
   float chi2_bckgr_fit_{-799.};
   float chi2_sgnl_fit_{-799.};
   
-  const float mu = 1.11572;                     //TODO remove this hardcode
-  const float sigma = 0.00145786;  
+  static constexpr float mu = 1.11572;                     //TODO remove this hardcode
+  static constexpr float sigma = 0.00145786;  
 };
 #endif // ShapeFitter_H
