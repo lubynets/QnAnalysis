@@ -32,7 +32,9 @@ public:
   float chi2_bckgr_fit_{-799.};
   float chi2_sgnl_fit_{-799.};
   
-  static constexpr float mu = 1.11572;                     //TODO remove this hardcode
-  static constexpr float sigma = 0.00145786;  
+ static constexpr float mu = 1.11572;                     //TODO remove this hardcode
+ static constexpr float sigma = 0.00145786;  
 };
+
+
 #endif // ShapeFitter_H
