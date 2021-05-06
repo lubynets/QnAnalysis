@@ -54,6 +54,9 @@ public:
   void SetGraphToFit(TGraph* graph) { graph_v_ = graph; };
   double GetVSignal() { return fit_params_.at(0); };
   double GetVSignalError() { return fit_params_errors_.at(0); };
+  double GetFitChi2() { return fit_chi2_; };
+  int GetFitNdf() { return fit_ndf_; };
+  double GetFitChi2Ndf() { return fit_chi2_/fit_ndf_; };
   const std::vector<double>& GetFitParameters() { return fit_params_; };
   const std::vector<double>& GetFitErrors() { return fit_params_errors_; };
   
@@ -67,6 +70,8 @@ private:
   
   std::vector<double> fit_params_;
   std::vector<double> fit_params_errors_;
+  double fit_chi2_{-999.};
+  int fit_ndf_{-999};
 };
 
 #endif//Fitter_H

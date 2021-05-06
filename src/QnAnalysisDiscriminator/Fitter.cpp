@@ -14,9 +14,10 @@ void Fitter::Fit()
   TF1* f = new TF1("f", funct, graphleft-0.01, graphright+0.01, Npar);
      
   graph_v_ -> Fit("f");
+  fit_chi2_ = f->GetChisquare();
+  fit_ndf_ = f->GetNDF();
   
-//   TF1* f2 = (TF1*)f->Clone("f2");
-  TF1* f2 = new TF1("f2", "[0] + [1]*(x-1.11572)", graphleft-0.01, graphright+0.01);
+  TF1* f2 = new TF1("f2", "[0] + [1]*(x-1.11572)", graphleft-0.01, graphright+0.01);  // contribution from bckgr to flow
   
   for(int i=0; i<Npar; i++)
   {
