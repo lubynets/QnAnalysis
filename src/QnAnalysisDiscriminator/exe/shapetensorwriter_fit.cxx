@@ -148,6 +148,7 @@ int main(int argc, char** argv)
   sct.Write("shapetensor");
   hchi2_bckgr_rec_fit.Write();
   hchi2_bckgr_mc_and_bckgr_rec_fit.Write();
+  hchi2_sgnl_mc_and_sgnl_rec.Write();
   hchi2_sgnl_mc_fit.Write();
   hchi2_sgnl_rec_fit.Write();
   hchi2_sgnl_mc_and_sgnl_rec_fit.Write();
