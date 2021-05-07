@@ -4,6 +4,20 @@
 #include "TH1F.h"
 #include "TF1.h"
 
+class MyFunctorShape
+{
+public:
+  
+  MyFunctorShape() = default;
+  virtual ~MyFunctorShape() = default;
+  
+  double operator()(double* x, double* par);
+  
+private:
+  
+  const float x0_ = 9e-4;
+};
+
 class ShapeFitter
 {
 public:
@@ -32,8 +46,8 @@ public:
   float chi2_bckgr_fit_{-799.};
   float chi2_sgnl_fit_{-799.};
   
- static constexpr float mu = 1.11572;                     //TODO remove this hardcode
- static constexpr float sigma = 0.00145786;  
+  static constexpr float mu = 1.11572;                     //TODO remove this hardcode
+  static constexpr float sigma = 0.00145786;  
 };
 
 

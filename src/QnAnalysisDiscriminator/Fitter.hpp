@@ -8,7 +8,7 @@
 #include "TGraph.h"
 #include "TF1.h"
 
-class MyFunctor
+class MyFunctor   // TODO rename
 {
 public:  
   
