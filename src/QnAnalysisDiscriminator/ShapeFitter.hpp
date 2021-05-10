@@ -3,6 +3,8 @@
 
 #include "TH1F.h"
 #include "TF1.h"
+#include "TMatrixD.h"
+#include "TVectorD.h"
 
 class MyFunctorShape
 {
@@ -38,6 +40,13 @@ public:
   TF1* FitBckgr(TH1F* histo, float left, float right) const;
   TF1* FitSgnl(TH1F* histo, float left, float right) const;
   TH1F* SubtractBckgr(TH1F* histo, TF1* func, float left, float right) const;
+  
+  void Subtract(TMatrixD& m, TMatrixD& v, int from, int what) const;
+  void SubtractFromLower(TMatrixD& m, TMatrixD& v, int what) const;
+  void SubtractFromUpper(TMatrixD& m, TMatrixD& v, int what) const;
+  void NullLDCorner(TMatrixD& m, TMatrixD& v) const;
+  void NullRUCorner(TMatrixD& m, TMatrixD& v) const;
+  void SetToOnes(TMatrixD& m, TMatrixD& v) const;  
     
   TH1F* histo_all_{nullptr};
   TH1F* histo_sgnl_{nullptr};
