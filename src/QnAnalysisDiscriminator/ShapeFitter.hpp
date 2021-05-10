@@ -15,7 +15,7 @@ public:
   
 private:
   
-  const float x0_ = 9e-4;
+  const float x0_ = 1.1e-3;
 };
 
 class ShapeFitter
@@ -46,7 +46,7 @@ public:
   float chi2_bckgr_fit_{-799.};
   float chi2_sgnl_fit_{-799.};
   
-  static constexpr float mu = 1.11572;                     //TODO remove this hardcode
+  static constexpr float mu = 1.115683;                     //TODO remove this hardcode
   static constexpr float sigma = 0.00145786;  
 };
 

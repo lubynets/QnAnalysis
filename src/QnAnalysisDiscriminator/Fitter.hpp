@@ -38,7 +38,7 @@ public:
   
 private:
   
-  const float mu = 1.11572;   //TODO remove this ugly hardcode ASAP
+  const float mu = 1.115683;   //TODO remove this ugly hardcode ASAP
 
   ShapeContainer* shape_{nullptr};
 };
