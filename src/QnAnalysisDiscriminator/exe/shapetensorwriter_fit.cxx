@@ -102,6 +102,9 @@ int main(int argc, char** argv)
         c1.cd();
         histobckgr -> Draw();
         sftr.GetFuncBckgr() -> Draw("same");
+        sftr.GetGraphBckgr()->SetFillStyle(3001);
+        sftr.GetGraphBckgr()->SetFillColor(kRed-4);
+        sftr.GetGraphBckgr() -> Draw("pe3 same");
         c1.Write(binname.c_str());
         
         fileOut -> cd("sgnl_mc_and_sgnl_rec");

@@ -1,8 +1,6 @@
 #include "ShapeFitter.hpp"
 
-#include "TMatrixD.h"
 #include "TVectorD.h"
-#include "TDecompLU.h"
 
 #include <array>
 
@@ -19,9 +17,12 @@ void ShapeFitter::Fit()
   const float right_external = ShapeFitter::mu + 15 * ShapeFitter::sigma;
 
   TH1F* histo_without_peak = ExcludeInterval(histo_all_, left_internal, right_internal);
+  
   func_bckgr_ = FitBckgr(histo_without_peak, left_external, right_external);
-  histo_sgnl_ = SubtractBckgr(histo_all_, func_bckgr_, left_external, right_external);
-  chi2_bckgr_fit_ = func_bckgr_->GetChisquare() / func_bckgr_->GetNDF();
+  graph_bckgr_ = FuncWithErrors(func_bckgr_);
+  
+  histo_sgnl_ = SubtractBckgr(histo_all_, func_bckgr_.first, left_external, right_external);
+  chi2_bckgr_fit_ = func_bckgr_.first->GetChisquare() / func_bckgr_.first->GetNDF();
   
   func_sgnl_ = FitSgnl(histo_sgnl_, left_external, right_external);        //TODO uncomment after debug
   chi2_sgnl_fit_ = func_sgnl_->GetChisquare() / func_sgnl_->GetNDF();
@@ -52,12 +53,53 @@ TH1F* ShapeFitter::SubtractBckgr(TH1F* histo, TF1* func, float left, float right
   return histo_out;
 }
 
-TF1* ShapeFitter::FitBckgr(TH1F* histo, float left, float right) const
+float ShapeFitter::EvalError(double* x, std::pair<TF1*, TMatrixDSym*> f_and_cov) const            // add check if npar of func is equal to dim cov
 {
-  TF1* bckgr_fit = new TF1 ("bckgr_fit", "pol3", left, right);                            // TODO make it settable
-  histo -> Fit(bckgr_fit, "R0");
-    
-  return bckgr_fit;
+  const int Npar = f_and_cov.first->GetNpar();
+  TMatrixD dfdp(Npar, 1);
+  for(int i=0; i<Npar; i++)
+    dfdp[i][0] = f_and_cov.first->GradientPar(i, x);
+  
+  TMatrixD dfdp_T = dfdp;
+  dfdp_T.T();
+  
+  return std::sqrt((dfdp_T*(*f_and_cov.second)*dfdp)[0][0]);
+}
+
+TGraphErrors* ShapeFitter::FuncWithErrors(std::pair<TF1*, TMatrixDSym*> f_and_cov) const
+{
+  TGraphErrors* graph = new TGraphErrors();
+  const int Nsteps = 1000;
+  const float left = f_and_cov.first->GetXmin();
+  const float right = f_and_cov.first->GetXmax();
+  const float step = (right-left)/Nsteps;
+  
+  double x = left;
+  int i = 0;
+  while(x<=right)
+  {
+    const float y = f_and_cov.first->Eval(x);
+    const float ey = EvalError(&x, f_and_cov);
+    graph->SetPoint(i, x, y);
+    graph->SetPointError(i, 0, ey);
+    x += step;
+    i++;
+  }  
+  
+  return graph;
+}
+
+std::pair<TF1*, TMatrixDSym*>  ShapeFitter::FitBckgr(TH1F* histo, float left, float right) const
+{
+  TF1* bckgr_fit = new TF1("bckgr_fit", "pol2", left, right);                            // TODO make it settable
+  TMatrixDSym* cov = new TMatrixDSym(bckgr_fit->GetNpar());
+  
+  TFitResultPtr frptr = histo -> Fit(bckgr_fit, "RS0");
+  *cov = frptr -> GetCovarianceMatrix();
+  
+  std::pair<TF1*, TMatrixDSym*> f_and_cov(bckgr_fit, cov);
+  
+  return f_and_cov;
 }
 
 // TF1* ShapeFitter::FitSgnl(TH1F* histo, float left, float right) const
