@@ -1,6 +1,7 @@
 #include "ShapeFitter.hpp"
 
-#include "TVectorD.h"
+#include "TMatrixD.h"
+#include "TFitResult.h"
 
 #include <array>
 
@@ -20,12 +21,12 @@ void ShapeFitter::Fit()
   
   func_bckgr_ = FitBckgr(histo_without_peak, left_external, right_external);
   graph_bckgr_ = FuncWithErrors(func_bckgr_);
-  
-  histo_sgnl_ = SubtractBckgr(histo_all_, func_bckgr_.first, left_external, right_external);
   chi2_bckgr_fit_ = func_bckgr_.first->GetChisquare() / func_bckgr_.first->GetNDF();
   
-  func_sgnl_ = FitSgnl(histo_sgnl_, left_external, right_external);        //TODO uncomment after debug
-  chi2_sgnl_fit_ = func_sgnl_->GetChisquare() / func_sgnl_->GetNDF();
+  histo_sgnl_ = SubtractBckgr(histo_all_, func_bckgr_, left_external, right_external);  
+  func_sgnl_ = FitSgnl(histo_sgnl_, left_external, right_external);
+  graph_sgnl_ = FuncWithErrors(func_sgnl_);
+  chi2_sgnl_fit_ = func_sgnl_.first->GetChisquare() / func_sgnl_.first->GetNDF();
 }
 
 TH1F* ShapeFitter::ExcludeInterval(TH1F* histo, float left, float right) const
@@ -37,18 +38,28 @@ TH1F* ShapeFitter::ExcludeInterval(TH1F* histo, float left, float right) const
   return histo_out;
 }
 
-TH1F* ShapeFitter::SubtractBckgr(TH1F* histo, TF1* func, float left, float right) const
+TH1F* ShapeFitter::SubtractBckgr(TH1F* histo, std::pair<TF1*, TMatrixDSym*> f_and_cov, float left, float right) const
 {
   TH1F* histo_out = (TH1F*)histo->Clone();
   histo_out -> Sumw2();
-  histo_out -> Add(func, -1);
+  histo_out -> Add(f_and_cov.first, -1);
   
   for(int iBin=1; iBin<=histo_out->GetNbinsX(); iBin++)
+  {
     if(histo_out->GetBinCenter(iBin)<left || histo_out->GetBinCenter(iBin)>right)
     {
       histo_out->SetBinContent(iBin, 0);
       histo_out->SetBinError(iBin, 0);
     }
+    else
+    {
+      const float eh = histo_out->GetBinError(iBin);
+      double binCenter = histo_out->GetBinCenter(iBin);
+      const float ef = EvalError(&binCenter, f_and_cov);
+      const float ee = std::sqrt(eh*eh + ef*ef);
+      histo_out -> SetBinError(iBin, ee);
+    }
+  }
       
   return histo_out;
 }
@@ -130,7 +141,7 @@ std::pair<TF1*, TMatrixDSym*>  ShapeFitter::FitBckgr(TH1F* histo, float left, fl
 
 
 //********** two expos and gauss ******************************************************
-TF1* ShapeFitter::FitSgnl(TH1F* histo, float left, float right) const
+std::pair<TF1*, TMatrixDSym*> ShapeFitter::FitSgnl(TH1F* histo, float left, float right) const
 {
   const int Npar = 6;
   
@@ -143,9 +154,14 @@ TF1* ShapeFitter::FitSgnl(TH1F* histo, float left, float right) const
   sgnl_fit -> SetParameter(4, 1000.);
   sgnl_fit -> SetParameter(5, -1000.);
   
-  histo -> Fit(sgnl_fit, "R0");
-
-  return sgnl_fit;
+  TMatrixDSym* cov = new TMatrixDSym(sgnl_fit->GetNpar());
+  
+  TFitResultPtr frptr = histo -> Fit(sgnl_fit, "RS0");
+  *cov = frptr -> GetCovarianceMatrix();
+  
+  std::pair<TF1*, TMatrixDSym*> f_and_cov(sgnl_fit, cov);
+  
+  return f_and_cov;
 }
 
 double MyFunctorShape::operator()(double* x, double* par)

@@ -107,7 +107,7 @@ int main(int argc, char** argv)
         sftr.GetFuncBckgr() -> Draw("same");
         sftr.GetGraphBckgr()->SetFillStyle(3001);
         sftr.GetGraphBckgr()->SetFillColor(kRed-4);
-        sftr.GetGraphBckgr() -> Draw("pe3 same");
+        sftr.GetGraphBckgr() -> Draw("e3 same");
         c1.Write(binname.c_str());
         
         fileOut -> cd("sgnl_mc_and_sgnl_rec");
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
         c3.cd();
         histosgnl -> Draw();
         ShapeFitter sftr_sgnl_mc(histosgnl);  // can be initialized with any histogram, not important
-        TF1* func_sgnl_fitmc = sftr_sgnl_mc.FitSgnl(histosgnl, mu - 15*sigma, mu + 15*sigma);
+        TF1* func_sgnl_fitmc = sftr_sgnl_mc.FitSgnl(histosgnl, mu - 15*sigma, mu + 15*sigma).first;
         func_sgnl_fitmc -> Draw("same");
         c3.Write(binname.c_str());
         
@@ -133,6 +133,9 @@ int main(int argc, char** argv)
         sftr.GetHistoSgnl() -> SetLineColor(kBlue);
         sftr.GetHistoSgnl() -> Draw();
         sftr.GetFuncSgnl() -> Draw("same");
+        sftr.GetGraphSgnl()->SetFillStyle(3001);
+        sftr.GetGraphSgnl()->SetFillColor(kRed-4);
+        sftr.GetGraphSgnl() -> Draw("e3 same");
         c4.Write(binname.c_str());
         
         fileOut -> cd("sgnl_mc_and_sgnl_rec_fit");
@@ -140,6 +143,9 @@ int main(int argc, char** argv)
         c5.cd();
         histosgnl -> Draw();
         sftr.GetFuncSgnl() -> Draw("same");
+        sftr.GetGraphSgnl()->SetFillStyle(3001);
+        sftr.GetGraphSgnl()->SetFillColor(kRed-4);
+        sftr.GetGraphSgnl() -> Draw("e3 same");
         c5.Write(binname.c_str());
         
         hchi2_bckgr_rec_fit.SetBinContent(iC+1, iy+1, ipT+1, sftr.GetChi2BckgrFit());
