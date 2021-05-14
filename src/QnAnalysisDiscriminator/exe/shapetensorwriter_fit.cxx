@@ -30,6 +30,9 @@ int main(int argc, char** argv)
   TH1F* histosgnl = nullptr;
   TH1F* histobckgr = nullptr;
   
+  const float mu = 1.115683;
+  const float sigma = 0.00145786;
+  
   const int C_nbins = 3;
   const int y_nbins = 4;
   const int pT_nbins = 4;
@@ -120,7 +123,7 @@ int main(int argc, char** argv)
         c3.cd();
         histosgnl -> Draw();
         ShapeFitter sftr_sgnl_mc(histosgnl);  // can be initialized with any histogram, not important
-        TF1* func_sgnl_fitmc = sftr_sgnl_mc.FitSgnl(histosgnl, ShapeFitter::mu - 15*ShapeFitter::sigma, ShapeFitter::mu + 15*ShapeFitter::sigma);
+        TF1* func_sgnl_fitmc = sftr_sgnl_mc.FitSgnl(histosgnl, mu - 15*sigma, mu + 15*sigma);
         func_sgnl_fitmc -> Draw("same");
         c3.Write(binname.c_str());
         
