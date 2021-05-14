@@ -15,7 +15,8 @@ public:
   
 private:
   
-  const float x0_ = 1.1e-3;
+  static constexpr float x0_internal_ = 0.9e-3;   // for lambda function need static constexpr instead of const. WHY?
+  static constexpr float x0_external_ = 1.3e-3;
 };
 
 class ShapeFitter
