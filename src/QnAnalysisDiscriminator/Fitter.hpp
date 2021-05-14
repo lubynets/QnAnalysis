@@ -7,6 +7,8 @@
 #include "TString.h"
 #include "TGraph.h"
 #include "TF1.h"
+#include "TMatrixDSym.h"
+#include "TGraphErrors.h"
 
 class MyFunctor   // TODO rename
 {
@@ -52,6 +54,9 @@ public:
   
   void SetShape(ShapeContainer* shape) { shape_ = shape; };
   void SetGraphToFit(TGraph* graph) { graph_v_ = graph; };
+  TF1* GetVFit() const { return v_fit_.first; };
+  TGraph* GetGraphToFit() const { return graph_v_; };
+  TGraphErrors* GetGraphFit() const { return graph_fit_; };
   double GetVSignal() { return fit_params_.at(0); };
   double GetVSignalError() { return fit_params_errors_.at(0); };
   double GetFitChi2() { return fit_chi2_; };
@@ -59,14 +64,18 @@ public:
   double GetFitChi2Ndf() { return fit_chi2_/fit_ndf_; };
   const std::vector<double>& GetFitParameters() { return fit_params_; };
   const std::vector<double>& GetFitErrors() { return fit_params_errors_; };
+  float EvalError(double* x, std::pair<TF1*, TMatrixDSym*> f_and_cov) const;    // TODO unite with the same function in ShapeFitter
+  TGraphErrors* FuncWithErrors(std::pair<TF1*, TMatrixDSym*> f_and_cov) const;  // TODO unite with the same function in ShapeFitter
   
   void Fit();
-  
   
 private:
   
   ShapeContainer* shape_{nullptr};
-  TGraph* graph_v_{nullptr};
+  TGraph* graph_v_{nullptr}; // to be fitted
+  
+  std::pair<TF1*, TMatrixDSym*> v_fit_{nullptr, nullptr};
+  TGraphErrors* graph_fit_{nullptr}; // result of fit with errors
   
   std::vector<double> fit_params_;
   std::vector<double> fit_params_errors_;

@@ -5,6 +5,7 @@
 #include "TFile.h"
 #include "TDirectory.h"
 #include "TH3.h"
+#include "TCanvas.h"
 
 #include <iostream>
 
@@ -16,7 +17,7 @@ void SetAxesNames(TH3F* histo,
 
 int main(int argc, char** argv)
 {
-  TString shapefilename="/home/user/cbmdir/working/qna/shapes/shapetensor_fit.apr20.dcmqgsm.nopid.lightcuts1.set4.pol3.root";
+  TString shapefilename="/home/user/cbmdir/working/qna/shapes/shapetensor.apr20.dcmqgsm.nopid.lightcuts1.set4.new.root";
   TFile* shapefile = TFile::Open(shapefilename, "read");
   ShapeContainerTensor* shcntr = (ShapeContainerTensor*)shapefile -> Get("shapetensor");
   
@@ -78,7 +79,14 @@ int main(int argc, char** argv)
         std::string vsignal = std::to_string(fitter.GetVSignal()) + " pm " + std::to_string(fitter.GetVSignalError());
                
         gr -> SetTitle(vsignal.c_str());
-        gr -> Write();
+//         gr -> Write();
+        TCanvas c1("", "", 1500, 900);
+        c1.cd();
+        gr -> Draw();
+        fitter.GetGraphFit()->SetFillStyle(3001);
+        fitter.GetGraphFit()->SetFillColor(kRed-4);
+        fitter.GetGraphFit() -> Draw("e3 same");
+        c1.Write(gr->GetName());
         
         hsignal.SetBinContent(iC+1, iy+1, ipT+1, fitter.GetFitParameters().at(0));
         hsignal.SetBinError(iC+1, iy+1, ipT+1, fitter.GetFitErrors().at(0));
