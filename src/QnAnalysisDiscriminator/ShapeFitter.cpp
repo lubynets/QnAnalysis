@@ -139,11 +139,10 @@ std::pair<TF1*, TMatrixDSym*>  ShapeFitter::FitBckgr(TH1F* histo, float left, fl
 //   return sgnl_fit;
 // }  
 
-
 //********** two expos and gauss ******************************************************
 std::pair<TF1*, TMatrixDSym*> ShapeFitter::FitSgnl(TH1F* histo, float left, float right) const
 {
-  const int Npar = 6;
+  const int Npar = 8;
   
   MyFunctorShape myfuncsh;
   TF1* sgnl_fit = new TF1("sgnl_fit", myfuncsh, left, right, Npar);
@@ -151,8 +150,11 @@ std::pair<TF1*, TMatrixDSym*> ShapeFitter::FitSgnl(TH1F* histo, float left, floa
   sgnl_fit -> FixParameter(1, ShapeFitter::mu);
   sgnl_fit -> SetParameter(2, 0);
   sgnl_fit -> SetParameter(3, ShapeFitter::sigma);
-  sgnl_fit -> SetParameter(4, 1000.);
-  sgnl_fit -> SetParameter(5, -1000.);
+  const float x_shift = 1.3e-3;     // point where Exp() is pre-defined
+  sgnl_fit -> SetParameter(4, histo->Interpolate(ShapeFitter::mu - x_shift) / TMath::Exp(-1000*x_shift));
+  sgnl_fit -> SetParameter(5, histo->Interpolate(ShapeFitter::mu + x_shift) / TMath::Exp(-1000*x_shift));
+  sgnl_fit -> SetParameter(6, 1000.);
+  sgnl_fit -> SetParameter(7, -1000.);
   
   TMatrixDSym* cov = new TMatrixDSym(sgnl_fit->GetNpar());
   
@@ -166,31 +168,47 @@ std::pair<TF1*, TMatrixDSym*> ShapeFitter::FitSgnl(TH1F* histo, float left, floa
 
 double MyFunctorShape::operator()(double* x, double* par)
 {
-  const double factor     = par[0];
-  const double shift      = par[1]; // to be fixed at real peak position
-  const double mu         = par[2]; // expected to be 0
-  const double sigma      = par[3];
-  const double k_left     = par[4];
-  const double k_right    = par[5];
+  const double factor_peak  = par[0];
+  const double shift        = par[1]; // to be fixed at real peak position
+  const double mu           = par[2]; // expected to be 0
+  const double sigma        = par[3];
+  const double factor_left  = par[4];
+  const double factor_right = par[5];
+  const double k_left       = par[6];
+  const double k_right      = par[7];
   
   const double xx = x[0] - shift;
-    
-  const double C_left  = TMath::Gaus(-x0_, mu, sigma) / TMath::Exp(-k_left*x0_);
-  const double C_right = TMath::Gaus( x0_, mu, sigma) / TMath::Exp( k_right*x0_);
   
-  if(xx < -x0_)
-    return factor*C_left*TMath::Exp(k_left * xx);
-  else if (xx > x0_)
-    return factor*C_right*TMath::Exp(k_right * xx);
+  auto alpha = [xx]           // fraction of Peak funkcion in transition region
+  {
+    double ksi = std::abs(xx);
+    if(ksi<x0_internal_)
+      return 1.;
+    else if(ksi>x0_external_)
+      return 0.;
+    else
+      return (x0_external_ - ksi) / (x0_external_ - x0_internal_);
+  };
+  
+  if(xx < -x0_external_)
+    return factor_left*TMath::Exp(k_left * xx);
+  else if(xx > x0_external_)
+    return factor_right*TMath::Exp(k_right * xx);
+  else if(std::abs(xx) < x0_internal_)
+    return factor_peak*TMath::Gaus(xx, mu, sigma);
+  else if(xx>x0_internal_ && xx<x0_external_)
+    return alpha()*factor_peak*TMath::Gaus(xx, mu, sigma) + (1 - alpha())*factor_right*TMath::Exp(k_right * xx);
+  else if(xx<-x0_internal_ && xx>-x0_external_)
+    return alpha()*factor_peak*TMath::Gaus(xx, mu, sigma) + (1 - alpha())*factor_left*TMath::Exp(k_left * xx);
   else
-    return factor*TMath::Gaus(xx, mu, sigma);  
+    return 0.;
 }
 //*************************************************************************************
 
 // //********** two expos and lorentz ****************************************************
 // TF1* ShapeFitter::FitSgnl(TH1F* histo, float left, float right) const
 // {
-//   const int Npar = 6;
+//   const int Npar = 8;
 //   
 //   MyFunctorShape myfuncsh;
 //   TF1* sgnl_fit = new TF1("sgnl_fit", myfuncsh, left, right, Npar);
@@ -198,8 +216,11 @@ double MyFunctorShape::operator()(double* x, double* par)
 //   sgnl_fit -> FixParameter(1, ShapeFitter::mu);
 //   sgnl_fit -> SetParameter(2, 0);
 //   sgnl_fit -> SetParameter(3, ShapeFitter::sigma);
-//   sgnl_fit -> SetParameter(4, 1000.);
-//   sgnl_fit -> SetParameter(5, -1000.);
+//   const float x_shift = 1.3e-3;     // point where Exp() is pre-defined
+//   sgnl_fit -> SetParameter(4, histo->Interpolate(ShapeFitter::mu - x_shift) / TMath::Exp(-1000*x_shift));
+//   sgnl_fit -> SetParameter(5, histo->Interpolate(ShapeFitter::mu + x_shift) / TMath::Exp(-1000*x_shift));
+//   sgnl_fit -> SetParameter(6, 1000.);
+//   sgnl_fit -> SetParameter(7, -1000.);
 //   
 //   histo -> Fit(sgnl_fit, "R0");
 // 
@@ -208,23 +229,39 @@ double MyFunctorShape::operator()(double* x, double* par)
 // 
 // double MyFunctorShape::operator()(double* x, double* par)
 // {
-//   const double factor     = par[0];
-//   const double shift      = par[1]; // to be fixed at real peak position
-//   const double mu         = par[2]; // expected to be 0
-//   const double sigma      = par[3];
-//   const double k_left     = par[4];
-//   const double k_right    = par[5];
+//   const double factor_peak  = par[0];
+//   const double shift        = par[1]; // to be fixed at real peak position
+//   const double mu           = par[2]; // expected to be 0
+//   const double sigma        = par[3];
+//   const double factor_left  = par[4];
+//   const double factor_right = par[5];
+//   const double k_left       = par[6];
+//   const double k_right      = par[7];
 //   
 //   const double xx = x[0] - shift;
-//     
-//   const double C_left  = TMath::CauchyDist(-x0_, mu, sigma) / TMath::Exp(-k_left*x0_);
-//   const double C_right = TMath::CauchyDist( x0_, mu, sigma) / TMath::Exp( k_right*x0_);
 //   
-//   if(xx < -x0_)
-//     return factor*C_left*TMath::Exp(k_left * xx);
-//   else if (xx > x0_)
-//     return factor*C_right*TMath::Exp(k_right * xx);
+//   auto alpha = [xx]           // fraction of Peak funkcion in transition region
+//   {
+//     double ksi = std::abs(xx);
+//     if(ksi<x0_internal_)
+//       return 1.;
+//     else if(ksi>x0_external_)
+//       return 0.;
+//     else
+//       return (x0_external_ - ksi) / (x0_external_ - x0_internal_);
+//   };
+//   
+//   if(xx < -x0_external_)
+//     return factor_left*TMath::Exp(k_left * xx);
+//   else if(xx > x0_external_)
+//     return factor_right*TMath::Exp(k_right * xx);
+//   else if(std::abs(xx) < x0_internal_)
+//     return factor_peak*TMath::CauchyDist(xx, mu, sigma);
+//   else if(xx>x0_internal_ && xx<x0_external_)
+//     return alpha()*factor_peak*TMath::CauchyDist(xx, mu, sigma) + (1 - alpha())*factor_right*TMath::Exp(k_right * xx);
+//   else if(xx<-x0_internal_ && xx>-x0_external_)
+//     return alpha()*factor_peak*TMath::CauchyDist(xx, mu, sigma) + (1 - alpha())*factor_left*TMath::Exp(k_left * xx);
 //   else
-//     return factor*TMath::CauchyDist(xx, mu, sigma);  
+//     return 0.;
 // }
 // //*************************************************************************************
