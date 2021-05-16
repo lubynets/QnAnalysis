@@ -102,7 +102,7 @@ TGraphErrors* ShapeFitter::FuncWithErrors(std::pair<TF1*, TMatrixDSym*> f_and_co
 
 std::pair<TF1*, TMatrixDSym*>  ShapeFitter::FitBckgr(TH1F* histo, float left, float right) const
 {
-  TF1* bckgr_fit = new TF1("bckgr_fit", "pol2", left, right);                            // TODO make it settable
+  TF1* bckgr_fit = new TF1("bckgr_fit", "pol3", left, right);                            // TODO make it settable
   TMatrixDSym* cov = new TMatrixDSym(bckgr_fit->GetNpar());
   
   TFitResultPtr frptr = histo -> Fit(bckgr_fit, "RS0");
@@ -139,14 +139,80 @@ std::pair<TF1*, TMatrixDSym*>  ShapeFitter::FitBckgr(TH1F* histo, float left, fl
 //   return sgnl_fit;
 // }  
 
-//********** two expos and gauss ******************************************************
+// //********** two expos and gauss ******************************************************
+// std::pair<TF1*, TMatrixDSym*> ShapeFitter::FitSgnl(TH1F* histo, float left, float right) const
+// {
+//   const int Npar = 8;
+//   
+//   MyFunctorShape myfuncsh;
+//   TF1* sgnl_fit = new TF1("sgnl_fit", myfuncsh, left, right, Npar);
+//   sgnl_fit -> SetParameter(0, histo->Interpolate(ShapeFitter::mu) / TMath::Gaus(0, 0, ShapeFitter::sigma));
+//   sgnl_fit -> FixParameter(1, ShapeFitter::mu);
+//   sgnl_fit -> SetParameter(2, 0);
+//   sgnl_fit -> SetParameter(3, ShapeFitter::sigma);
+//   const float x_shift = 1.3e-3;     // point where Exp() is pre-defined
+//   sgnl_fit -> SetParameter(4, histo->Interpolate(ShapeFitter::mu - x_shift) / TMath::Exp(-1000*x_shift));
+//   sgnl_fit -> SetParameter(5, histo->Interpolate(ShapeFitter::mu + x_shift) / TMath::Exp(-1000*x_shift));
+//   sgnl_fit -> SetParameter(6, 1000.);
+//   sgnl_fit -> SetParameter(7, -1000.);
+//   
+//   TMatrixDSym* cov = new TMatrixDSym(sgnl_fit->GetNpar());
+//   
+//   TFitResultPtr frptr = histo -> Fit(sgnl_fit, "RS0");
+//   *cov = frptr -> GetCovarianceMatrix();
+//   
+//   std::pair<TF1*, TMatrixDSym*> f_and_cov(sgnl_fit, cov);
+//   
+//   return f_and_cov;
+// }
+// 
+// double MyFunctorShape::operator()(double* x, double* par)
+// {
+//   const double factor_peak  = par[0];
+//   const double shift        = par[1]; // to be fixed at real peak position
+//   const double mu           = par[2]; // expected to be 0
+//   const double sigma        = par[3];
+//   const double factor_left  = par[4];
+//   const double factor_right = par[5];
+//   const double k_left       = par[6];
+//   const double k_right      = par[7];
+//   
+//   const double xx = x[0] - shift;
+//   
+//   auto alpha = [xx]           // fraction of Peak funkcion in transition region
+//   {
+//     double ksi = std::abs(xx);
+//     if(ksi<x0_internal_)
+//       return 1.;
+//     else if(ksi>x0_external_)
+//       return 0.;
+//     else
+//       return (x0_external_ - ksi) / (x0_external_ - x0_internal_);
+//   };
+//   
+//   if(xx < -x0_external_)
+//     return factor_left*TMath::Exp(k_left * xx);
+//   else if(xx > x0_external_)
+//     return factor_right*TMath::Exp(k_right * xx);
+//   else if(std::abs(xx) < x0_internal_)
+//     return factor_peak*TMath::Gaus(xx, mu, sigma);
+//   else if(xx>x0_internal_ && xx<x0_external_)
+//     return alpha()*factor_peak*TMath::Gaus(xx, mu, sigma) + (1 - alpha())*factor_right*TMath::Exp(k_right * xx);
+//   else if(xx<-x0_internal_ && xx>-x0_external_)
+//     return alpha()*factor_peak*TMath::Gaus(xx, mu, sigma) + (1 - alpha())*factor_left*TMath::Exp(k_left * xx);
+//   else
+//     return 0.;
+// }
+// //*************************************************************************************
+
+//********** two expos and lorentz ****************************************************
 std::pair<TF1*, TMatrixDSym*> ShapeFitter::FitSgnl(TH1F* histo, float left, float right) const
 {
   const int Npar = 8;
   
   MyFunctorShape myfuncsh;
   TF1* sgnl_fit = new TF1("sgnl_fit", myfuncsh, left, right, Npar);
-  sgnl_fit -> SetParameter(0, histo->Interpolate(ShapeFitter::mu) / TMath::Gaus(0, 0, ShapeFitter::sigma));
+  sgnl_fit -> SetParameter(0, histo->Interpolate(ShapeFitter::mu) / TMath::CauchyDist(0, 0, ShapeFitter::sigma));
   sgnl_fit -> FixParameter(1, ShapeFitter::mu);
   sgnl_fit -> SetParameter(2, 0);
   sgnl_fit -> SetParameter(3, ShapeFitter::sigma);
@@ -195,73 +261,12 @@ double MyFunctorShape::operator()(double* x, double* par)
   else if(xx > x0_external_)
     return factor_right*TMath::Exp(k_right * xx);
   else if(std::abs(xx) < x0_internal_)
-    return factor_peak*TMath::Gaus(xx, mu, sigma);
+    return factor_peak*TMath::CauchyDist(xx, mu, sigma);
   else if(xx>x0_internal_ && xx<x0_external_)
-    return alpha()*factor_peak*TMath::Gaus(xx, mu, sigma) + (1 - alpha())*factor_right*TMath::Exp(k_right * xx);
+    return alpha()*factor_peak*TMath::CauchyDist(xx, mu, sigma) + (1 - alpha())*factor_right*TMath::Exp(k_right * xx);
   else if(xx<-x0_internal_ && xx>-x0_external_)
-    return alpha()*factor_peak*TMath::Gaus(xx, mu, sigma) + (1 - alpha())*factor_left*TMath::Exp(k_left * xx);
+    return alpha()*factor_peak*TMath::CauchyDist(xx, mu, sigma) + (1 - alpha())*factor_left*TMath::Exp(k_left * xx);
   else
     return 0.;
 }
 //*************************************************************************************
-
-// //********** two expos and lorentz ****************************************************
-// TF1* ShapeFitter::FitSgnl(TH1F* histo, float left, float right) const
-// {
-//   const int Npar = 8;
-//   
-//   MyFunctorShape myfuncsh;
-//   TF1* sgnl_fit = new TF1("sgnl_fit", myfuncsh, left, right, Npar);
-//   sgnl_fit -> SetParameter(0, histo->Interpolate(ShapeFitter::mu) / TMath::CauchyDist(0, 0, ShapeFitter::sigma));
-//   sgnl_fit -> FixParameter(1, ShapeFitter::mu);
-//   sgnl_fit -> SetParameter(2, 0);
-//   sgnl_fit -> SetParameter(3, ShapeFitter::sigma);
-//   const float x_shift = 1.3e-3;     // point where Exp() is pre-defined
-//   sgnl_fit -> SetParameter(4, histo->Interpolate(ShapeFitter::mu - x_shift) / TMath::Exp(-1000*x_shift));
-//   sgnl_fit -> SetParameter(5, histo->Interpolate(ShapeFitter::mu + x_shift) / TMath::Exp(-1000*x_shift));
-//   sgnl_fit -> SetParameter(6, 1000.);
-//   sgnl_fit -> SetParameter(7, -1000.);
-//   
-//   histo -> Fit(sgnl_fit, "R0");
-// 
-//   return sgnl_fit;
-// }
-// 
-// double MyFunctorShape::operator()(double* x, double* par)
-// {
-//   const double factor_peak  = par[0];
-//   const double shift        = par[1]; // to be fixed at real peak position
-//   const double mu           = par[2]; // expected to be 0
-//   const double sigma        = par[3];
-//   const double factor_left  = par[4];
-//   const double factor_right = par[5];
-//   const double k_left       = par[6];
-//   const double k_right      = par[7];
-//   
-//   const double xx = x[0] - shift;
-//   
-//   auto alpha = [xx]           // fraction of Peak funkcion in transition region
-//   {
-//     double ksi = std::abs(xx);
-//     if(ksi<x0_internal_)
-//       return 1.;
-//     else if(ksi>x0_external_)
-//       return 0.;
-//     else
-//       return (x0_external_ - ksi) / (x0_external_ - x0_internal_);
-//   };
-//   
-//   if(xx < -x0_external_)
-//     return factor_left*TMath::Exp(k_left * xx);
-//   else if(xx > x0_external_)
-//     return factor_right*TMath::Exp(k_right * xx);
-//   else if(std::abs(xx) < x0_internal_)
-//     return factor_peak*TMath::CauchyDist(xx, mu, sigma);
-//   else if(xx>x0_internal_ && xx<x0_external_)
-//     return alpha()*factor_peak*TMath::CauchyDist(xx, mu, sigma) + (1 - alpha())*factor_right*TMath::Exp(k_right * xx);
-//   else if(xx<-x0_internal_ && xx>-x0_external_)
-//     return alpha()*factor_peak*TMath::CauchyDist(xx, mu, sigma) + (1 - alpha())*factor_left*TMath::Exp(k_left * xx);
-//   else
-//     return 0.;
-// }
-// //*************************************************************************************
