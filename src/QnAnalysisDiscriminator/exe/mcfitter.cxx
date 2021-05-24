@@ -9,20 +9,23 @@ std::string StringBinNumber(int number);
 
 int main(int argc, char** argv)
 {
-  TString sgnlfilename="/home/user/cbmdir/working/qna/aXmass/cl.dcmqgsm.apr20.lightcuts1.nopid.set4pull.sgnl_12.root";
-  TString bckgrfilename="/home/user/cbmdir/working/qna/aXmass/cl.dcmqgsm.apr20.lightcuts1.nopid.set4pull.bckgr.root";
+  TString sgnlfilename="/home/user/cbmdir/working/qna/aXmass/cl.dcmqgsm.apr20.lightcuts1.nopid.set4.sgnl_12.root";
+  TString bckgrfilename="/home/user/cbmdir/working/qna/aXmass/cl.dcmqgsm.apr20.lightcuts1.nopid.set4.bckgr.root";
 
   TFile* sgnlfile = TFile::Open(sgnlfilename, "read");
   TFile* bckgrfile = TFile::Open(bckgrfilename, "read");
   
+  //   std::string component = "x1x1";
+  std::string component = "y1y1";
+  
   GraphExtractor sgnlgex;
-  Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>* lambda_psi_xx_sgnl = (Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>*)sgnlfile -> Get("rec/RESCALED/u_rec_RESCALED.Q_psi_PLAIN.x1x1");
-  sgnlgex.SetDataContainer(lambda_psi_xx_sgnl);
+  Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>* lambda_psi_sgnl = (Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>*)sgnlfile -> Get(("rec/RESCALED/u_rec_RESCALED.Q_psi_PLAIN." + component).c_str());
+  sgnlgex.SetDataContainer(lambda_psi_sgnl);
   sgnlgex.SetNamesAxesToExclude({"AnaEventHeader_tracks_centrality", "RecParticlesMcPid_rapidity", "RecParticlesMcPid_pT"});
   
   GraphExtractor bckgrgex;
-  Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>* lambda_psi_xx_bckgr = (Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>*)bckgrfile -> Get("rec/RESCALED/u_rec_RESCALED.Q_psi_PLAIN.x1x1");
-  bckgrgex.SetDataContainer(lambda_psi_xx_bckgr);
+  Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>* lambda_psi_bckgr = (Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>*)bckgrfile -> Get(("rec/RESCALED/u_rec_RESCALED.Q_psi_PLAIN." + component).c_str());
+  bckgrgex.SetDataContainer(lambda_psi_bckgr);
   bckgrgex.SetNamesAxesToExclude({"AnaEventHeader_tracks_centrality", "RecParticlesMcPid_rapidity", "RecParticlesMcPid_pT"});
   
   std::vector<int> axessizes = sgnlgex.GetAxesSizes();

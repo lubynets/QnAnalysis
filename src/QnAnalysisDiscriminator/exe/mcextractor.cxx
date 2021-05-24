@@ -9,12 +9,15 @@ std::string StringBinNumber(int number);
 
 int main(int argc, char** argv)
 {
-  TString filename="/home/user/cbmdir/working/qna/aXmass/cl.dcmqgsm.apr20.lightcuts1.nopid.set4pull.all.root";
+  TString filename="/home/user/cbmdir/working/qna/aXmass/cl.dcmqgsm.apr20.lightcuts1.nopid.set4.all.root";
   TFile* fileIn = TFile::Open(filename, "read");
   
+  //   std::string component = "x1x1";
+  std::string component = "y1y1";
+  
   GraphExtractor gex;
-  Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>* mc_lambda_psi_xx_sgnl = (Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>*)fileIn -> Get("sim/u_sim_PLAIN.Q_psi_PLAIN.x1x1");
-  gex.SetDataContainer(mc_lambda_psi_xx_sgnl);
+  Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>* mc_lambda_psi_sgnl = (Qn::DataContainer<Qn::StatCollect,Qn::Axis<double>>*)fileIn -> Get(("sim/u_sim_PLAIN.Q_psi_PLAIN." + component).c_str());
+  gex.SetDataContainer(mc_lambda_psi_sgnl);
   gex.SetNamesAxesToExclude({"AnaEventHeader_tracks_centrality", "SimParticles_rapidity", "SimParticles_pT"});
   
   std::vector<int> axessizes = gex.GetAxesSizes();
